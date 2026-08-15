@@ -1,0 +1,18 @@
+{% comment %} Optional heading strip shown above a table card.
+
+   Usage:
+     {% include "components/table_card.html" with title="Inventory by Batch" %}
+     <div class="table-scroll"> ... table ... </div>
+
+   The white rounded surface itself comes from .table-scroll in the theme
+   stylesheet, so tables did not need their markup rewritten. {% endcomment %}
+
+<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+    <div>
+        <div class="section-label mb-0">{{ title }}</div>
+        {% if subtitle %}<div class="small text-muted">{{ subtitle }}</div>{% endif %}
+    </div>
+    {% if count is not None %}
+        <span class="small text-muted">{{ count }} record{{ count|pluralize }}</span>
+    {% endif %}
+</div>

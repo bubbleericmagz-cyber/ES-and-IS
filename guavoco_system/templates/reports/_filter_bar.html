@@ -1,0 +1,40 @@
+{# Shared filter bar for every report. Included with the report's own page. #}
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-2">
+        <label class="form-label small mb-1">Start date</label>
+        <input type="date" name="start" value="{{ filters.start }}" class="form-control">
+    </div>
+    <div class="col-md-2">
+        <label class="form-label small mb-1">End date</label>
+        <input type="date" name="end" value="{{ filters.end }}" class="form-control">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Product</label>
+        <select name="product" class="form-select">
+            <option value="">All products</option>
+            {% for product in products %}
+                <option value="{{ product.id }}"
+                        {% if filters.product == product.id|stringformat:"s" %}selected{% endif %}>
+                    {{ product.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select">
+            <option value="">All statuses</option>
+            {% for value, label in status_choices %}
+                <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>
+                    {{ label }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2 d-grid gap-1">
+        <button type="submit" class="btn btn-outline-guava">Apply Filters</button>
+        <button type="submit" name="export" value="csv" class="btn btn-sm btn-guava">
+            Export CSV
+        </button>
+    </div>
+</form>

@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    {% if is_admin %}
+        <a href="{% url 'product_update' product.pk %}" class="btn btn-outline-guava">Edit</a>
+    {% endif %}
+    <a href="{% url 'product_list' %}" class="btn btn-link">Back to products</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-label">Product Details</div>
+                <dl class="row mb-0 small">
+                    <dt class="col-5">SKU</dt><dd class="col-7"><code>{{ product.sku }}</code></dd>
+                    <dt class="col-5">Size</dt><dd class="col-7">{{ product.size }}</dd>
+                    <dt class="col-5">Selling Price</dt>
+                    <dd class="col-7">PHP {{ product.selling_price|floatformat:2 }}</dd>
+                    <dt class="col-5">Reorder Level</dt><dd class="col-7">{{ product.reorder_level }}</dd>
+                    <dt class="col-5">Status</dt>
+                    <dd class="col-7">
+                        {% include "components/status_badge.html" with status=product.status_label %}
+                    </dd>
+                    <dt class="col-5">Description</dt>
+                    <dd class="col-7">{{ product.description|default:"--" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        {% include "components/stat_card.html" with label="Total Stock" value=product.current_stock icon="i-inventory" tone="sage" %}
+    </div>
+    <div class="col-md-3">
+        {% include "components/stat_card.html" with label="Sellable (not expired)" value=product.sellable_stock icon="i-check" tone="primary" %}
+    </div>
+</div>
+
+<div class="section-label mt-4">Inventory by Batch</div>
+<div class="table-scroll">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Batch</th>
+                <th class="text-end">Available</th>
+                <th>Packaged</th>
+                <th>Expires</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in inventory_rows %}
+                <tr>
+                    <td>{{ row.batch.batch_number }}</td>
+                    <td class="text-end">{{ row.quantity_available }}</td>
+                    <td>{{ row.date_packaged }}</td>
+                    <td>{{ row.expiration_date }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=row.status %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-muted small">No packaged stock yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="section-label mt-4">Recent Orders</div>
+<div class="table-scroll">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Order</th><th>Customer</th><th>Date</th>
+                <th class="text-end">Quantity</th><th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in recent_orders %}
+                <tr>
+                    <td><a href="{% url 'order_detail' order.pk %}">{{ order.order_number }}</a></td>
+                    <td>{{ order.customer.business_name }}</td>
+                    <td>{{ order.order_date }}</td>
+                    <td class="text-end">{{ order.quantity }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=order.status %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-muted small">No orders yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

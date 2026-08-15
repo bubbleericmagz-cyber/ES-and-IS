@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block content %}
+
+<div class="section-label">Orders Waiting To Be Shipped</div>
+<div class="table-scroll mb-4">
+    <table class="table table-sm align-middle">
+        <thead>
+            <tr>
+                <th>Order</th><th>Customer</th><th>Product</th>
+                <th class="text-end">Quantity</th><th>Status</th><th class="text-end">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in ready_orders %}
+                <tr>
+                    <td><a href="{% url 'order_detail' order.pk %}">{{ order.order_number }}</a></td>
+                    <td>{{ order.customer.business_name }}</td>
+                    <td>{{ order.product.name }}</td>
+                    <td class="text-end">{{ order.quantity }}</td>
+                    <td>{% include "components/status_badge.html" with status=order.status %}</td>
+                    <td class="text-end">
+                        <a href="{% url 'distribute_order' order.pk %}"
+                           class="btn btn-sm btn-guava">Distribute</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="6" class="text-muted small">No orders are waiting to be shipped.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<div class="section-label">Distribution Records</div>
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-5">
+        <label class="form-label small mb-1">Search</label>
+        <input type="text" name="q" value="{{ search }}" class="form-control"
+               placeholder="GVC-DIST-0001, order number or customer">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Delivery status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            {% for value, label in statuses %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-outline-guava">Apply</button>
+        <a href="{% url 'distribution_list' %}" class="btn btn-link">Clear</a>
+    </div>
+</form>
+
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Distribution Number</th><th>Order</th><th>Customer</th><th>Date</th>
+                <th class="text-end">Quantity</th><th>Method</th><th>Tracking</th>
+                <th>Delivery Status</th><th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shipment in distributions %}
+                <tr>
+                    <td>
+                        <a href="{% url 'distribution_detail' shipment.pk %}">
+                            {{ shipment.distribution_number }}
+                        </a>
+                    </td>
+                    <td>{{ shipment.order.order_number }}</td>
+                    <td>{{ shipment.order.customer.business_name }}</td>
+                    <td>{{ shipment.distribution_date }}</td>
+                    <td class="text-end">{{ shipment.quantity_distributed }}</td>
+                    <td>{{ shipment.delivery_method }}</td>
+                    <td>{{ shipment.tracking_number|default:"--" }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=shipment.delivery_status %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a href="{% url 'distribution_update' shipment.pk %}"
+                           class="btn btn-sm btn-outline-secondary">Update</a>
+                        {% if not shipment.confirmation %}
+                            <a href="{% url 'delivery_confirm' shipment.pk %}"
+                               class="btn btn-sm btn-guava">Confirm Delivery</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="9" class="empty-state">No distributions recorded yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

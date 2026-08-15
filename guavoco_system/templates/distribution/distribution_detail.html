@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    <a href="{% url 'distribution_update' shipment.pk %}" class="btn btn-outline-secondary">
+        Update Status
+    </a>
+    {% if not confirmation %}
+        <a href="{% url 'delivery_confirm' shipment.pk %}" class="btn btn-guava">
+            Confirm Delivery
+        </a>
+    {% endif %}
+    <a href="{% url 'distribution_list' %}" class="btn btn-link">Back to distribution</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-label">Shipment</div>
+                <dl class="row mb-0 small">
+                    <dt class="col-5">Order</dt>
+                    <dd class="col-7">
+                        <a href="{% url 'order_detail' shipment.order.pk %}">
+                            {{ shipment.order.order_number }}
+                        </a>
+                    </dd>
+                    <dt class="col-5">Customer</dt><dd class="col-7">{{ shipment.order.customer.business_name }}</dd>
+                    <dt class="col-5">Product</dt><dd class="col-7">{{ shipment.order.product.name }}</dd>
+                    <dt class="col-5">Distribution Date</dt><dd class="col-7">{{ shipment.distribution_date }}</dd>
+                    <dt class="col-5">Quantity</dt><dd class="col-7">{{ shipment.quantity_distributed }} units</dd>
+                    <dt class="col-5">Delivery Method</dt><dd class="col-7">{{ shipment.delivery_method }}</dd>
+                    <dt class="col-5">Tracking Number</dt><dd class="col-7">{{ shipment.tracking_number|default:"--" }}</dd>
+                    <dt class="col-5">Delivery Status</dt>
+                    <dd class="col-7">
+                        {% include "components/status_badge.html" with status=shipment.delivery_status %}
+                    </dd>
+                    <dt class="col-5">Remarks</dt><dd class="col-7">{{ shipment.remarks|default:"--" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-label">Delivery Confirmation</div>
+                {% if confirmation %}
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Delivery Date</dt><dd class="col-7">{{ confirmation.delivery_date }}</dd>
+                        <dt class="col-5">Received By</dt><dd class="col-7">{{ confirmation.receiver_name }}</dd>
+                        <dt class="col-5">Delivered Quantity</dt>
+                        <dd class="col-7">{{ confirmation.delivered_quantity }} units</dd>
+                        <dt class="col-5">Remarks</dt><dd class="col-7">{{ confirmation.remarks|default:"--" }}</dd>
+                    </dl>
+                {% else %}
+                    <p class="text-muted small mb-0">
+                        This shipment has not been confirmed as delivered yet.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="section-label">Batches Used In This Shipment</div>
+<div class="table-scroll">
+    <table class="table table-sm">
+        <thead>
+            <tr><th>Batch Number</th><th>Expiration Date</th><th class="text-end">Units Taken</th></tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+                <tr>
+                    <td>
+                        <a href="{% url 'batch_detail' item.batch.pk %}">
+                            {{ item.batch.batch_number }}
+                        </a>
+                    </td>
+                    <td>{{ item.batch.expiration_date }}</td>
+                    <td class="text-end">{{ item.quantity }}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="3" class="text-muted small">No batch records for this shipment.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    {% if order.can_be_distributed %}
+        <a href="{% url 'distribute_order' order.pk %}" class="btn btn-guava">Distribute Order</a>
+        <a href="{% url 'order_update' order.pk %}" class="btn btn-outline-secondary">Edit</a>
+        <a href="{% url 'order_cancel' order.pk %}" class="btn btn-outline-secondary">Cancel Order</a>
+    {% endif %}
+    <a href="{% url 'order_list' %}" class="btn btn-link">Back to orders</a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-3 mb-4">
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="section-label">Order Details</div>
+                <dl class="row mb-0 small">
+                    <dt class="col-sm-4">Customer</dt>
+                    <dd class="col-sm-8">
+                        <a href="{% url 'customer_detail' order.customer.pk %}">
+                            {{ order.customer.business_name }}
+                        </a>
+                        <span class="text-muted">({{ order.customer.customer_type }})</span>
+                    </dd>
+                    <dt class="col-sm-4">Order Date</dt><dd class="col-sm-8">{{ order.order_date }}</dd>
+                    <dt class="col-sm-4">Product</dt><dd class="col-sm-8">{{ order.product.name }}</dd>
+                    <dt class="col-sm-4">Quantity</dt><dd class="col-sm-8">{{ order.quantity }} units</dd>
+                    <dt class="col-sm-4">Unit Price</dt>
+                    <dd class="col-sm-8">PHP {{ order.unit_price|floatformat:2 }}</dd>
+                    <dt class="col-sm-4">Total Amount</dt>
+                    <dd class="col-sm-8"><strong>PHP {{ order.total_amount|floatformat:2 }}</strong></dd>
+                    <dt class="col-sm-4">Status</dt>
+                    <dd class="col-sm-8">
+                        {% include "components/status_badge.html" with status=order.status %}
+                    </dd>
+                    <dt class="col-sm-4">Notes</dt><dd class="col-sm-8">{{ order.notes|default:"--" }}</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        {% if stock_on_hand >= order.quantity %}
+            {% include "components/stat_card.html" with label="Stock On Hand (not expired)" value=stock_on_hand icon="i-check" tone="primary" hint="Enough stock is available to fill this order." %}
+        {% else %}
+            {% include "components/stat_card.html" with label="Stock On Hand (not expired)" value=stock_on_hand icon="i-alert" tone="guava" hint="Not enough stock for this order." %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="section-label">Distributions</div>
+<div class="table-scroll">
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Distribution Number</th><th>Date</th>
+                <th class="text-end">Quantity</th><th>Method</th><th>Delivery Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for shipment in distributions %}
+                <tr>
+                    <td>
+                        <a href="{% url 'distribution_detail' shipment.pk %}">
+                            {{ shipment.distribution_number }}
+                        </a>
+                    </td>
+                    <td>{{ shipment.distribution_date }}</td>
+                    <td class="text-end">{{ shipment.quantity_distributed }}</td>
+                    <td>{{ shipment.delivery_method }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=shipment.delivery_status %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="text-muted small">This order has not been shipped yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

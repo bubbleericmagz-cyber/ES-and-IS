@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    <a href="{% url 'packaging_create' %}" class="btn btn-guava">Record Packaging</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        {% include "components/stat_card.html" with label="Total Received" value=total_received icon="i-layers" tone="sage" %}
+    </div>
+    <div class="col-6 col-md-3">
+        {% include "components/stat_card.html" with label="Total Packaged" value=total_packaged icon="i-box" tone="secondary" %}
+    </div>
+    <div class="col-6 col-md-3">
+        {% include "components/stat_card.html" with label="Total Damaged" value=total_damaged icon="i-alert" tone="guava" %}
+    </div>
+    <div class="col-6 col-md-3">
+        {% include "components/stat_card.html" with label="Packaging Efficiency" value=overall_efficiency|stringformat:"s"|add:"%" icon="i-trend" tone="primary" %}
+    </div>
+</div>
+
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-5">
+        <label class="form-label small mb-1">Search by packaging ID or batch number</label>
+        <input type="text" name="q" value="{{ search }}" class="form-control"
+               placeholder="GVC-PKG-0001 or GVC-BATCH-0001">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            {% for value, label in statuses %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-outline-guava">Apply</button>
+        <a href="{% url 'packaging_list' %}" class="btn btn-link">Clear</a>
+    </div>
+</form>
+
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Packaging ID</th>
+                <th>Batch</th>
+                <th>Date</th>
+                <th class="text-end">Received</th>
+                <th class="text-end">Packaged</th>
+                <th class="text-end">Damaged</th>
+                <th class="text-end">Remaining</th>
+                <th class="text-end">Efficiency</th>
+                <th>Staff</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in records %}
+                <tr>
+                    <td><code>{{ record.packaging_id }}</code></td>
+                    <td>
+                        <a href="{% url 'batch_detail' record.batch.pk %}">
+                            {{ record.batch.batch_number }}
+                        </a>
+                    </td>
+                    <td>{{ record.packaging_date }}</td>
+                    <td class="text-end">{{ record.quantity_received }}</td>
+                    <td class="text-end">{{ record.quantity_packaged }}</td>
+                    <td class="text-end">{{ record.damaged_quantity }}</td>
+                    <td class="text-end">{{ record.remaining_quantity }}</td>
+                    <td class="text-end">{{ record.efficiency }}%</td>
+                    <td>{{ record.packaging_staff.username|default:"--" }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=record.status %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        {% if record.status != 'Completed' %}
+                            <a href="{% url 'packaging_update' record.pk %}"
+                               class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'packaging_complete' record.pk %}"
+                               class="btn btn-sm btn-guava">Complete</a>
+                        {% else %}
+                            <span class="text-muted small">In inventory</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="11" class="empty-state">No packaging records yet.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted small">
+    Marking a record as <strong>Complete</strong> is what moves the packaged units
+    into the finished product inventory. Completed records can no longer be edited.
+</p>
+{% endblock %}

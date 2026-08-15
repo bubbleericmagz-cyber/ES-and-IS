@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load static guavoco_extras %}
+
+{% block heading %}Guavoco Operations Dashboard{% endblock %}
+
+{% block content %}
+
+{# ---------- Primary KPIs ---------- #}
+<div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3">
+        {% include "components/stat_card.html" with label="Available Stock" value=stats.total_stock icon="i-inventory" tone="primary" hint="Units in finished inventory" %}
+    </div>
+    <div class="col-6 col-xl-3">
+        {% include "components/stat_card.html" with label="Units Packaged" value=stats.units_packaged icon="i-box" tone="secondary" hint="Across all completed packaging" %}
+    </div>
+    <div class="col-6 col-xl-3">
+        {% include "components/stat_card.html" with label="Pending Orders" value=stats.pending_orders icon="i-clock" tone="warning" hint="Waiting to be processed" %}
+    </div>
+    <div class="col-6 col-xl-3">
+        {% include "components/stat_card.html" with label="Delivered Orders" value=stats.delivered_orders icon="i-check" tone="primary" hint="Completed end to end" %}
+    </div>
+</div>
+
+{# ---------- Secondary figures ---------- #}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-xl-4">
+        {% include "components/stat_card.html" with label="Total Products" value=stats.total_products icon="i-package" tone="sage" small=True %}
+    </div>
+    <div class="col-6 col-xl-4">
+        {% include "components/stat_card.html" with label="Ready for Distribution" value=stats.for_distribution icon="i-truck" tone="secondary" small=True %}
+    </div>
+    <div class="col-6 col-xl-4">
+        {% include "components/stat_card.html" with label="Low Stock Items" value=stats.low_stock_items icon="i-alert" tone="guava" small=True %}
+    </div>
+</div>
+
+{# ---------- Charts ---------- #}
+<div class="row g-3 mb-4">
+    <div class="col-12 col-xl-6">
+        <div class="chart-card">
+            <div class="chart-title">Packaging Activity</div>
+            <div class="chart-subtitle">Units packaged per day, last 14 days</div>
+            <div class="chart-holder"><canvas id="packagingChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="chart-card">
+            <div class="chart-title">Order Status</div>
+            <div class="chart-subtitle">Number of orders at each stage</div>
+            <div class="chart-holder"><canvas id="orderStatusChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="chart-card">
+            <div class="chart-title">Inventory Overview</div>
+            <div class="chart-subtitle">Units available per product</div>
+            <div class="chart-holder"><canvas id="inventoryChart"></canvas></div>
+        </div>
+    </div>
+    <div class="col-12 col-xl-6">
+        <div class="chart-card">
+            <div class="chart-title">Distribution Activity</div>
+            <div class="chart-subtitle">Units distributed per day, last 14 days</div>
+            <div class="chart-holder"><canvas id="distributionChart"></canvas></div>
+        </div>
+    </div>
+</div>
+
+{# ---------- Warnings and recent activity ---------- #}
+<div class="row g-3">
+    <div class="col-12 col-lg-4">
+        <div class="panel">
+            <div class="panel-title">Low Stock Warnings</div>
+            {% if low_stock_products or low_stock_materials %}
+                <ul class="list-group list-group-flush">
+                    {% for product in low_stock_products %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>{{ product.name }}</span>
+                            <span class="gv-badge gv-badge--lowstock">
+                                {{ product.current_stock }} left
+                            </span>
+                        </li>
+                    {% endfor %}
+                    {% for material in low_stock_materials %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>{{ material.name }}
+                                <span class="text-muted small">(material)</span>
+                            </span>
+                            <span class="gv-badge gv-badge--lowstock">
+                                {{ material.quantity_available }} {{ material.unit }}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% include "components/empty_state.html" with icon="i-check" title="Everything is stocked" text="Every product and material is above its reorder level." %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="panel">
+            <div class="panel-title">Expiration Monitoring</div>
+            {% if expiring_soon %}
+                <ul class="list-group list-group-flush">
+                    {% for row in expiring_soon %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                            <span>
+                                {{ row.batch.batch_number }}
+                                <span class="d-block text-muted small">
+                                    {{ row.quantity_available }} units
+                                </span>
+                            </span>
+                            {% include "components/status_badge.html" with status=row.expiry_state %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% include "components/empty_state.html" with icon="i-leaf" title="No stock expiring soon" text="Nothing in inventory expires within the next 60 days." %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+        <div class="panel d-flex flex-column">
+            <div class="panel-title">Recent Activity</div>
+            {% if recent_activities %}
+                <ul class="list-group list-group-flush flex-grow-1">
+                    {% for log in recent_activities %}
+                        <li class="list-group-item px-0">
+                            <div class="fw-semibold" style="color: var(--heading-section);">
+                                {{ log.action }}
+                            </div>
+                            <div class="text-muted small">
+                                {{ log.description|truncatechars:70 }}
+                            </div>
+                            <div class="text-muted" style="font-size: 0.72rem;">
+                                {{ log.user.username|default:"system" }} &middot;
+                                {{ log.timestamp|date:"M d, Y H:i" }}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <a class="small mt-3" href="{% url 'activity_log' %}">
+                    View the full activity log
+                </a>
+            {% else %}
+                {% include "components/empty_state.html" with icon="i-activity" title="No activity yet" text="Actions taken in the system will be listed here." %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{{ chart_data|json_script:"chart-data" }}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static 'vendor/chart.umd.min.js' %}"></script>
+    <script src="{% static 'js/dashboard.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    {% if is_admin %}
+        <a href="{% url 'batch_create' %}" class="btn btn-guava">Add Batch</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-4">
+        <label class="form-label small mb-1">Search by batch number</label>
+        <input type="text" name="q" value="{{ search }}" class="form-control"
+               placeholder="GVC-BATCH-0001">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            {% for value, label in statuses %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Product</label>
+        <select name="product" class="form-select">
+            <option value="">All</option>
+            {% for product in products %}
+                <option value="{{ product.id }}"
+                        {% if product_id == product.id|stringformat:"s" %}selected{% endif %}>
+                    {{ product.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-guava">Apply</button>
+    </div>
+</form>
+
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Batch Number</th>
+                <th>Product</th>
+                <th>Produced</th>
+                <th>Expires</th>
+                <th class="text-end">Qty Produced</th>
+                <th class="text-end">Not Yet Packaged</th>
+                <th>Status</th>
+                <th>Expiry</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+                <tr>
+                    <td><a href="{% url 'batch_detail' batch.pk %}">{{ batch.batch_number }}</a></td>
+                    <td>{{ batch.product.name }}</td>
+                    <td>{{ batch.production_date }}</td>
+                    <td>{{ batch.expiration_date }}</td>
+                    <td class="text-end">{{ batch.quantity_produced }}</td>
+                    <td class="text-end">{{ batch.quantity_available }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=batch.status %}
+                    </td>
+                    <td>
+                        {% include "components/status_badge.html" with status=batch.expiry_state %}
+                    </td>
+                    <td class="text-end">
+                        {% if is_admin %}
+                            <a href="{% url 'batch_update' batch.pk %}"
+                               class="btn btn-sm btn-outline-secondary">Edit</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="9" class="empty-state">No production batches found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

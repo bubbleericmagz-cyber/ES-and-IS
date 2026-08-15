@@ -1,0 +1,19 @@
+{% comment %} An empty table / list message.
+
+   Usage inside a table:
+     <tr><td colspan="8">
+       {% include "components/empty_state.html" with title="No packaging records yet."
+          text="Records appear here once a production batch has been processed."
+          icon="i-box" action_url=... action_label="Record Packaging" %}
+     </td></tr> {% endcomment %}
+
+<div class="empty-state">
+    <span class="empty-icon">
+        <svg class="gv-icon"><use href="#{{ icon|default:'i-leaf' }}"></use></svg>
+    </span>
+    <div class="empty-title">{{ title }}</div>
+    {% if text %}<p class="empty-text">{{ text }}</p>{% endif %}
+    {% if action_url and action_label %}
+        <a href="{{ action_url }}" class="btn btn-sm btn-guava">{{ action_label }}</a>
+    {% endif %}
+</div>

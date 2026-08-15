@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block header_actions %}
+    <a href="{% url 'user_create' %}" class="btn btn-guava">Add User</a>
+{% endblock %}
+
+{% block content %}
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Username</th><th>Full Name</th><th>Email</th>
+                <th>Role</th><th>Status</th><th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.user.username }}</td>
+                    <td>{{ row.user.get_full_name|default:"--" }}</td>
+                    <td>{{ row.user.email|default:"--" }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=row.role %}
+                    </td>
+                    <td>
+                        {% if row.user.is_active %}
+                            {% include "components/status_badge.html" with status="Active" %}
+                        {% else %}
+                            {% include "components/status_badge.html" with status="Inactive" %}
+                        {% endif %}
+                    </td>
+                    <td class="text-end">
+                        {% if row.user != user %}
+                            <a href="{% url 'user_toggle' row.user.pk %}"
+                               class="btn btn-sm btn-outline-secondary">
+                                {% if row.user.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                        {% else %}
+                            <span class="text-muted small">This is you</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted small">
+    <strong>Administrators</strong> can manage everything.
+    <strong>Staff</strong> can record packaging, manage orders, record distributions,
+    and view inventory and reports.
+</p>
+{% endblock %}

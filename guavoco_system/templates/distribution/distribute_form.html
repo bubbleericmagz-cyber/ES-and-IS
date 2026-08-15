@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="section-label">Order Being Shipped</div>
+                <dl class="row mb-0 small">
+                    <dt class="col-6">Order</dt><dd class="col-6">{{ order.order_number }}</dd>
+                    <dt class="col-6">Customer</dt><dd class="col-6">{{ order.customer.business_name }}</dd>
+                    <dt class="col-6">Product</dt><dd class="col-6">{{ order.product.name }}</dd>
+                    <dt class="col-6">Quantity</dt><dd class="col-6">{{ order.quantity }} units</dd>
+                </dl>
+            </div>
+        </div>
+        {% if stock_on_hand >= order.quantity %}
+            {% include "components/stat_card.html" with label="Stock On Hand (not expired)" value=stock_on_hand icon="i-check" tone="primary" %}
+        {% else %}
+            {% include "components/stat_card.html" with label="Stock On Hand (not expired)" value=stock_on_hand icon="i-alert" tone="guava" %}
+        {% endif %}
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                {% if stock_on_hand < order.quantity %}
+                    <div class="alert alert-danger small">
+                        There are only {{ stock_on_hand }} non-expired units in stock, but this
+                        order needs {{ order.quantity }}. Complete more packaging records
+                        before shipping this order.
+                    </div>
+                {% else %}
+                    <p class="text-muted small">
+                        Stock is taken from the batches that expire soonest first.
+                        Expired batches are never used. Saving this form deducts
+                        {{ order.quantity }} units from inventory.
+                    </p>
+                {% endif %}
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    {% include "partials/form_fields.html" %}
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-guava"
+                                {% if stock_on_hand < order.quantity %}disabled{% endif %}>
+                            Distribute Order
+                        </button>
+                        <a href="{% url 'order_detail' order.pk %}" class="btn btn-link">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

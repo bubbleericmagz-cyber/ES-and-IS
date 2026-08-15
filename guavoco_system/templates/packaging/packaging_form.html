@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <p class="text-muted small">
+            Remaining Quantity is worked out automatically:
+            <code>Received &minus; Packaged &minus; Damaged</code>.
+            You cannot receive more units than the batch still has unpackaged.
+        </p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_fields.html" %}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-guava">Save Packaging Record</button>
+                <a href="{% url 'packaging_list' %}" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

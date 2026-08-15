@@ -1,0 +1,8 @@
+{% comment %} A soft status badge.
+
+   Usage:  {% include "components/status_badge.html" with status=order.status %}
+
+   The |badge filter (core/templatetags/guavoco_extras.py) turns the status word
+   into one of the Guavoco badge tones: success, progress, primary, pending,
+   lowstock, danger, transit or neutral. {% endcomment %}
+{% load guavoco_extras %}<span class="gv-badge gv-badge--{{ status|badge }}">{{ status }}</span>

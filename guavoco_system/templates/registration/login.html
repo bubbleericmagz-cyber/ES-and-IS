@@ -1,0 +1,100 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Login | Guavoco System</title>
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/guavoco-theme.css' %}">
+</head>
+<body>
+
+{% include "components/icons.html" %}
+
+<div class="login-page">
+    <div class="login-shell">
+
+        {# ---- Left: Guavoco branding over a soft botanical texture ---- #}
+        <div class="login-brand">
+            <svg class="login-leaves" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid slice"
+                 aria-hidden="true" fill="none" stroke="#FFFFFF" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+                <path d="M-20 470c0-120 70-210 240-225-5 150-80 225-180 225a120 120 0 0 1-60 0z"/>
+                <path d="M-10 465c50-52 105-97 175-135"/>
+                <path d="M300 40c60 40 80 110 45 175-55-30-75-105-45-175z"/>
+                <path d="M330 62c-5 55-2 105 10 150"/>
+                <path d="M120 130c55-25 110 0 130 55-55 25-110 0-130-55z"/>
+                <path d="M135 137c40 5 80 22 112 45"/>
+                <path d="M250 330c50-10 90 25 90 75-50 10-90-25-90-75z"/>
+            </svg>
+
+            <div class="login-brand-content">
+                <h1>Guavoco</h1>
+                <p class="login-tagline">
+                    Guava &amp; Coconut Toothpaste<br>
+                    Packaging &amp; Distribution System
+                </p>
+                <hr class="accent-rule mb-4">
+                <ul class="login-points">
+                    <li>
+                        <svg class="gv-icon"><use href="#i-layers"></use></svg>
+                        Track every production batch
+                    </li>
+                    <li>
+                        <svg class="gv-icon"><use href="#i-box"></use></svg>
+                        Record packaging and damaged units
+                    </li>
+                    <li>
+                        <svg class="gv-icon"><use href="#i-inventory"></use></svg>
+                        Keep inventory accurate and current
+                    </li>
+                    <li>
+                        <svg class="gv-icon"><use href="#i-truck"></use></svg>
+                        Follow orders through to delivery
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {# ---- Right: the login form ---- #}
+        <div class="login-form-panel">
+            <h2 class="mb-1">Sign in</h2>
+            <p class="text-muted small mb-4">
+                Enter your account details to open the system.
+            </p>
+
+            {% if form.errors %}
+                <div class="alert alert-danger py-2 small">
+                    That username and password did not match. Please try again.
+                </div>
+            {% endif %}
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <input type="text" name="username" id="id_username"
+                           class="form-control" required autofocus autocomplete="username">
+                </div>
+                <div class="mb-4">
+                    <label for="id_password" class="form-label">Password</label>
+                    <input type="password" name="password" id="id_password"
+                           class="form-control" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn btn-guava w-100">Log in</button>
+            </form>
+
+            <div class="demo-accounts mt-4">
+                <div class="fw-semibold mb-1" style="color: var(--heading-section);">
+                    Demo accounts
+                </div>
+                Administrator &mdash; <code>admin</code> / <code>admin123</code><br>
+                Staff &mdash; <code>staff</code> / <code>staff123</code>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

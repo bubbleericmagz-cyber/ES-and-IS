@@ -1,0 +1,25 @@
+{% comment %} A KPI / statistic card: white surface, tinted icon container, dark number
+   and a muted label.
+
+   Usage:
+     {% include "components/stat_card.html" with label="Pending Orders"
+        value=stats.pending_orders icon="i-clock" tone="warning"
+        hint="Waiting to be processed" %}
+
+   tone: primary | secondary | sage | guava | warning | brown
+   small=True renders the compact variant. {% endcomment %}
+
+<div class="stat-card{% if small %} stat-card-sm{% endif %}">
+    <div class="stat-top">
+        <div>
+            <div class="stat-label">{{ label }}</div>
+            <div class="stat-value">{{ value }}</div>
+        </div>
+        {% if icon %}
+            <span class="stat-icon icon-{{ tone|default:'primary' }}">
+                <svg class="gv-icon"><use href="#{{ icon }}"></use></svg>
+            </span>
+        {% endif %}
+    </div>
+    {% if hint %}<p class="stat-hint">{{ hint }}</p>{% endif %}
+</div>

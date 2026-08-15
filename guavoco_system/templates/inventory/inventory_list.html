@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        {% include "components/stat_card.html" with label="Units in Stock" value=total_units icon="i-inventory" tone="primary" %}
+    </div>
+    <div class="col-6 col-md-3">
+        {% include "components/stat_card.html" with label="Expired Units" value=expired_units icon="i-clock" tone="guava" %}
+    </div>
+</div>
+
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-4">
+        <label class="form-label small mb-1">Search by batch or product</label>
+        <input type="text" name="q" value="{{ search }}" class="form-control"
+               placeholder="GVC-BATCH-0001 or Guavoco">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Product</label>
+        <select name="product" class="form-select">
+            <option value="">All</option>
+            {% for product in products %}
+                <option value="{{ product.id }}"
+                        {% if product_id == product.id|stringformat:"s" %}selected{% endif %}>
+                    {{ product.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Inventory status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            {% for value in statuses %}
+                <option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ value }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-guava">Apply</button>
+    </div>
+</form>
+
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Batch Number</th>
+                <th class="text-end">Quantity Available</th>
+                <th>Date Packaged</th>
+                <th>Expiration Date</th>
+                <th>Expiry</th>
+                <th>Inventory Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.product.name }}</td>
+                    <td>
+                        <a href="{% url 'batch_detail' row.batch.pk %}">
+                            {{ row.batch.batch_number }}
+                        </a>
+                    </td>
+                    <td class="text-end fw-semibold">{{ row.quantity_available }}</td>
+                    <td>{{ row.date_packaged }}</td>
+                    <td>{{ row.expiration_date }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=row.expiry_state %}
+                    </td>
+                    <td>
+                        {% include "components/status_badge.html" with status=row.status %}
+                    </td>
+                    <td class="text-end">
+                        {% if is_admin %}
+                            <a href="{% url 'inventory_adjust' row.pk %}"
+                               class="btn btn-sm btn-outline-secondary">Adjust</a>
+                        {% else %}
+                            <span class="text-muted small">View only</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        No stock yet. Complete a packaging record to fill the inventory.
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="text-muted small">
+    Expired stock stays visible for record keeping, but it is skipped when orders
+    are distributed.
+</p>
+{% endblock %}

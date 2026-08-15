@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    <a href="{% url 'report_index' %}" class="btn btn-link">All reports</a>
+{% endblock %}
+
+{% block content %}
+{% include "reports/_filter_bar.html" %}
+
+<div class="table-scroll">
+    <table class="table table-sm table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Product</th><th>Batch</th><th class="text-end">Available Stock</th>
+                <th>Date Packaged</th><th>Expiration Date</th><th>Expiry</th><th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr>
+                    <td>{{ row.product.name }}</td>
+                    <td>{{ row.batch.batch_number }}</td>
+                    <td class="text-end">{{ row.quantity_available }}</td>
+                    <td>{{ row.date_packaged }}</td>
+                    <td>{{ row.expiration_date }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=row.expiry_state %}
+                    </td>
+                    <td>{% include "components/status_badge.html" with status=row.status %}</td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="7" class="empty-state">No inventory matches these filters.</td></tr>
+            {% endfor %}
+        </tbody>
+        {% if rows %}
+            <tfoot>
+                <tr class="fw-semibold">
+                    <td colspan="2">Total ({{ rows|length }} rows)</td>
+                    <td class="text-end">{{ total_units }}</td>
+                    <td colspan="4"></td>
+                </tr>
+            </tfoot>
+        {% endif %}
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <p class="text-muted small">
+            The total amount is calculated automatically as
+            <code>Quantity &times; Unit Price</code>. Stock is checked when the order
+            status is set to <em>Processing</em> or <em>Ready for Distribution</em>.
+        </p>
+
+        <div class="alert alert-info py-2 small d-none" id="stock-hint"></div>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_fields.html" %}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-guava">Save Order</button>
+                <a href="{% url 'order_list' %}" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// When a product is chosen, fill in its price and show how much stock is on hand.
+(function () {
+    const productField = document.getElementById('id_product');
+    const priceField = document.getElementById('id_unit_price');
+    const hint = document.getElementById('stock-hint');
+    if (!productField) { return; }
+
+    productField.addEventListener('change', function () {
+        if (!this.value) { hint.classList.add('d-none'); return; }
+        fetch('/orders/price/' + this.value + '/')
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (priceField && !priceField.value) {
+                    priceField.value = data.unit_price;
+                }
+                hint.textContent =
+                    'Available stock for this product: ' + data.available_stock + ' units.';
+                hint.classList.remove('d-none');
+            })
+            .catch(function () { hint.classList.add('d-none'); });
+    });
+})();
+</script>
+{% endblock %}

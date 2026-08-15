@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    {% if is_admin %}
+        <a href="{% url 'customer_create' %}" class="btn btn-guava">Add Customer</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-4">
+        <label class="form-label small mb-1">Search by business or contact</label>
+        <input type="text" name="q" value="{{ search }}" class="form-control"
+               placeholder="Business name, contact person, GVC-CUS-0001">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Customer type</label>
+        <select name="type" class="form-select">
+            <option value="">All</option>
+            {% for value, label in types %}
+                <option value="{{ value }}" {% if customer_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-outline-guava">Apply</button>
+    </div>
+</form>
+
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>ID</th><th>Business Name</th><th>Contact Person</th>
+                <th>Phone</th><th>Email</th><th>Type</th><th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for customer in customers %}
+                <tr>
+                    <td><code>{{ customer.customer_id }}</code></td>
+                    <td>
+                        <a href="{% url 'customer_detail' customer.pk %}">
+                            {{ customer.business_name }}
+                        </a>
+                    </td>
+                    <td>{{ customer.contact_person }}</td>
+                    <td>{{ customer.phone_number }}</td>
+                    <td>{{ customer.email|default:"--" }}</td>
+                    <td>{{ customer.customer_type }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=customer.status_label %}
+                    </td>
+                    <td class="text-end">
+                        {% if is_admin %}
+                            <a href="{% url 'customer_update' customer.pk %}"
+                               class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'customer_toggle' customer.pk %}"
+                               class="btn btn-sm btn-outline-secondary">
+                                {% if customer.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                        {% else %}
+                            <span class="text-muted small">View only</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="8" class="empty-state">No customers or distributors found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,1340 @@
+/* ==========================================================================
+   Guavoco Packaging & Distribution Management System
+   Theme stylesheet - loaded AFTER Bootstrap so it overrides the defaults.
+
+   The palette comes from the Guavoco guava and coconut toothpaste packaging:
+   deep botanical green, fresh leaf green, soft sage, coconut cream, white,
+   and small guava coral accents.
+   ========================================================================== */
+
+:root {
+    /* ---- Official Guavoco palette ---- */
+    --guavoco-primary: #3F5A1A;
+    --guavoco-secondary: #6E8B2C;
+    --guavoco-sage: #A8B39A;
+    --guavoco-guava: #F27F6A;
+    --guavoco-cream: #F3EFE7;
+    --guavoco-brown: #6B4328;
+    --guavoco-text: #26311F;
+    --guavoco-white: #FFFFFF;
+
+    /* ---- Practical working variables ---- */
+    --bg-main: #F3EFE7;
+    --bg-surface: #FFFFFF;
+
+    --primary: #3F5A1A;
+    --primary-hover: #334A15;
+
+    --secondary: #6E8B2C;
+    --secondary-hover: #5C7624;
+
+    --accent: #F27F6A;
+
+    --text-primary: #26311F;
+    --text-secondary: #66705D;
+    --text-muted: #87917F;
+
+    --border-color: #D7DDCF;
+
+    --sage-light: #E8ECE4;
+    --cream-dark: #E8E2D8;
+
+    --coconut-brown: #6B4328;
+
+    /* ---- Derived tokens used throughout ---- */
+    --heading-strong: #26311F;
+    --heading-section: #35452B;
+    --label-color: #394532;
+
+    --card-border: #E1E5DC;
+    --card-radius: 12px;
+    --card-shadow: 0 2px 8px rgba(38, 49, 31, 0.05);
+
+    --table-head-bg: #F7F8F4;
+    --table-head-text: #46513F;
+    --table-row-border: #E5E8E0;
+    --table-row-hover: #FAFBF8;
+
+    --input-border: #CCD3C5;
+
+    --sidebar-width: 252px;
+    --topbar-height: 68px;
+}
+
+/* ==========================================================================
+   1. Base
+   ========================================================================== */
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.925rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: var(--heading-strong);
+    font-weight: 600;
+}
+
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
+}
+
+code {
+    color: var(--coconut-brown);
+    background-color: var(--cream-dark);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+}
+
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-secondary {
+    color: var(--text-secondary) !important;
+}
+
+/* Small uppercase section labels used above tables and panels. */
+.section-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-secondary);
+    margin-bottom: 0.6rem;
+}
+
+/* ==========================================================================
+   2. Layout shell
+   ========================================================================== */
+
+.app-shell {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1 1 auto;
+    padding: 1.5rem 2rem 3rem;
+}
+
+/* ==========================================================================
+   3. Sidebar
+   ========================================================================== */
+
+/* Flex column: brand at the top, menu scrolls in the middle, account block
+   pinned at the bottom so Logout can always be reached. */
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1030;
+    background-color: var(--primary);
+    color: rgba(255, 255, 255, 0.82);
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar .brand {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    min-height: var(--topbar-height);
+    padding: 0.9rem 1.15rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.sidebar .brand-name {
+    color: var(--guavoco-white);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin: 0;
+}
+
+.sidebar .brand-subtitle {
+    display: block;
+    color: rgba(255, 255, 255, 0.62);
+    font-size: 0.7rem;
+    letter-spacing: 0.02em;
+    margin-top: 0.15rem;
+}
+
+/* min-height: 0 is what lets the scrolling child actually shrink. */
+.sidebar-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-menu {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    padding: 0.6rem 0.6rem 1rem;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.28) transparent;
+    /* Bootstrap's .nav sets flex-wrap: wrap. In a column with a limited height
+       that makes the last items wrap into a second column and scroll sideways,
+       so the menu must be told not to wrap. */
+    flex-wrap: nowrap;
+}
+
+/* Without wrapping, flex children would shrink to fit. Pin every item and
+   section label to its natural height so the list scrolls instead. */
+.sidebar-menu > li {
+    flex: 0 0 auto;
+}
+
+.sidebar-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 3px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.45);
+}
+
+.sidebar .nav-section {
+    font-size: 0.66rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: rgba(255, 255, 255, 0.42);
+    padding: 1.1rem 0.75rem 0.35rem;
+}
+
+.sidebar .nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--guavoco-white);
+    text-decoration: none;
+}
+
+.sidebar .nav-link.active {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: var(--guavoco-white);
+    font-weight: 600;
+}
+
+/* Subtle sage indicator on the active item - not a full coral background. */
+.sidebar .nav-link.active::before {
+    content: "";
+    position: absolute;
+    left: -0.6rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 1.35rem;
+    border-radius: 0 3px 3px 0;
+    background-color: var(--guavoco-sage);
+}
+
+/* Icons take the colour of their label. */
+.sidebar .nav-link .gv-icon {
+    flex: 0 0 auto;
+    width: 17px;
+    height: 17px;
+    opacity: 0.85;
+}
+
+.sidebar .nav-link.active .gv-icon {
+    opacity: 1;
+}
+
+.sidebar-footer {
+    flex: 0 0 auto;
+    padding: 0.65rem 0.6rem 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    background-color: rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-footer .account-name {
+    color: var(--guavoco-white);
+    font-size: 0.83rem;
+    font-weight: 600;
+}
+
+.sidebar-footer .account-role {
+    color: rgba(255, 255, 255, 0.58);
+    font-size: 0.72rem;
+}
+
+.sidebar-footer .nav-link {
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    margin-top: 0.4rem;
+}
+
+.sidebar-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: transparent;
+    color: var(--guavoco-white);
+    border-radius: 8px;
+    padding: 0.3rem 0.65rem;
+    font-size: 0.85rem;
+}
+
+.sidebar-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   4. Top navigation bar
+   ========================================================================== */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background-color: var(--bg-surface);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.85rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: var(--topbar-height);
+}
+
+.topbar .page-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.topbar .page-subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0.1rem 0 0;
+}
+
+.topbar-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.topbar-divider {
+    width: 1px;
+    height: 26px;
+    background-color: var(--border-color);
+    margin: 0 0.25rem;
+}
+
+/* Notification bell with a small guava coral dot. */
+.topbar-bell {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-secondary);
+}
+
+.topbar-bell:hover {
+    background-color: var(--sage-light);
+    color: var(--primary);
+}
+
+.topbar-bell .bell-dot {
+    position: absolute;
+    top: 6px;
+    right: 7px;
+    min-width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background-color: var(--accent);
+    border: 2px solid var(--bg-surface);
+}
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.35rem;
+    border-radius: 9px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+}
+
+.user-chip:hover {
+    background-color: var(--sage-light);
+    color: var(--text-primary);
+}
+
+.user-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background-color: var(--primary);
+    color: var(--guavoco-white);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.user-chip .user-name {
+    font-size: 0.83rem;
+    font-weight: 600;
+    line-height: 1.15;
+}
+
+.user-chip .user-role {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.15;
+}
+
+.dropdown-menu {
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(38, 49, 31, 0.1);
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.dropdown-item:active,
+.dropdown-item.active {
+    background-color: var(--primary);
+    color: var(--guavoco-white);
+}
+
+.dropdown-item:hover {
+    background-color: var(--sage-light);
+    color: var(--text-primary);
+}
+
+.dropdown-header {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 600;
+}
+
+.notification-item {
+    display: flex;
+    gap: 0.6rem;
+    align-items: flex-start;
+    white-space: normal;
+}
+
+/* ==========================================================================
+   5. Cards and panels
+   ========================================================================== */
+
+.card,
+.table-card,
+.chart-card,
+.panel {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+}
+
+.card {
+    color: var(--text-primary);
+}
+
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-title,
+.panel-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--heading-section);
+    margin-bottom: 0.85rem;
+}
+
+.panel {
+    padding: 1.25rem;
+    height: 100%;
+}
+
+/* ---- Statistic / KPI cards ---- */
+
+.stat-card {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    padding: 1.1rem 1.15rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.stat-card .stat-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.stat-card .stat-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 0.2rem;
+}
+
+.stat-card .stat-value {
+    font-size: 1.65rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.stat-card .stat-hint {
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Compact variant for secondary figures. */
+.stat-card.stat-card-sm {
+    padding: 0.85rem 1rem;
+}
+
+.stat-card.stat-card-sm .stat-value {
+    font-size: 1.2rem;
+}
+
+/* ---- Tinted icon containers ---- */
+
+.stat-icon {
+    flex: 0 0 auto;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon .gv-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.icon-primary {
+    background: rgba(63, 90, 26, 0.12);
+    color: var(--primary);
+}
+
+.icon-secondary {
+    background: rgba(110, 139, 44, 0.13);
+    color: var(--secondary);
+}
+
+.icon-sage {
+    background: rgba(168, 179, 154, 0.22);
+    color: #5F6B52;
+}
+
+.icon-guava {
+    background: rgba(242, 127, 106, 0.14);
+    color: #B84F3D;
+}
+
+.icon-warning {
+    background: rgba(196, 145, 42, 0.14);
+    color: #8A6414;
+}
+
+.icon-brown {
+    background: rgba(107, 67, 40, 0.12);
+    color: var(--coconut-brown);
+}
+
+/* ---- Charts ---- */
+
+.chart-card {
+    padding: 1.15rem 1.25rem 1.25rem;
+    height: 100%;
+}
+
+.chart-card h6,
+.chart-card .chart-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--heading-section);
+    margin-bottom: 0.15rem;
+}
+
+.chart-card .chart-subtitle {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    margin-bottom: 0.9rem;
+}
+
+.chart-holder {
+    position: relative;
+    height: 260px;
+}
+
+/* ==========================================================================
+   6. Tables
+   ========================================================================== */
+
+/* The scroll wrapper doubles as the white table card. */
+.table-scroll {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    overflow-x: auto;
+}
+
+.table-scroll > .table {
+    margin-bottom: 0;
+}
+
+.table {
+    color: var(--text-primary);
+    border-color: var(--table-row-border);
+    --bs-table-bg: transparent;
+}
+
+.table thead th {
+    background-color: var(--table-head-bg);
+    color: var(--table-head-text);
+    font-size: 0.73rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--table-row-border);
+    white-space: nowrap;
+    padding: 0.7rem 0.9rem;
+}
+
+.table tbody td {
+    padding: 0.7rem 0.9rem;
+    border-color: var(--table-row-border);
+    vertical-align: middle;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.table-hover > tbody > tr:hover > * {
+    background-color: var(--table-row-hover);
+    color: var(--text-primary);
+}
+
+.table tfoot td {
+    background-color: var(--table-head-bg);
+    color: var(--heading-section);
+    border-top: 1px solid var(--table-row-border);
+    padding: 0.7rem 0.9rem;
+}
+
+/* Round the first and last header/footer cells with the card. */
+.table-scroll > .table > thead > tr:first-child > th:first-child {
+    border-top-left-radius: var(--card-radius);
+}
+
+.table-scroll > .table > thead > tr:first-child > th:last-child {
+    border-top-right-radius: var(--card-radius);
+}
+
+/* Definition lists used on detail pages. */
+dl dt {
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+
+dl dd {
+    color: var(--text-primary);
+    font-size: 0.87rem;
+}
+
+/* ==========================================================================
+   7. Status badges
+   ========================================================================== */
+
+.gv-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    line-height: 1.35;
+    white-space: nowrap;
+    border: 1px solid transparent;
+}
+
+.gv-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background-color: currentColor;
+    opacity: 0.75;
+}
+
+/* Active / Completed / Delivered / Available / Safe */
+.gv-badge--success {
+    background-color: #E5EEDB;
+    color: #3F5A1A;
+    border-color: #D5E3C6;
+}
+
+/* Processing / In Progress / Ready for Packaging */
+.gv-badge--progress {
+    background-color: #EDF1DE;
+    color: #647C26;
+    border-color: #DEE6C9;
+}
+
+/* Packaged / Ready for Distribution - the deeper brand green */
+.gv-badge--primary {
+    background-color: #E1E9D6;
+    color: #33491A;
+    border-color: #CFDCBE;
+}
+
+/* Pending - soft warm yellow */
+.gv-badge--pending {
+    background-color: #FAF0D7;
+    color: #8A6414;
+    border-color: #F0E2BE;
+}
+
+/* Low stock / expiring soon - muted orange */
+.gv-badge--lowstock {
+    background-color: #FBEADF;
+    color: #9C5626;
+    border-color: #F2D8C6;
+}
+
+/* Expired / Cancelled / Out of Stock - soft red with a guava undertone */
+.gv-badge--danger {
+    background-color: #FBE5E0;
+    color: #A8412C;
+    border-color: #F3D2CA;
+}
+
+/* In Transit / Distributed / For Delivery - calm blue */
+.gv-badge--transit {
+    background-color: #E3EBF1;
+    color: #3C5A72;
+    border-color: #D2DEE7;
+}
+
+/* Inactive / Preparing / Produced - neutral sage */
+.gv-badge--neutral {
+    background-color: var(--sage-light);
+    color: #55604C;
+    border-color: #DBE1D5;
+}
+
+/* ==========================================================================
+   8. Buttons
+   ========================================================================== */
+
+.btn {
+    border-radius: 9px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    padding: 0.44rem 0.95rem;
+    transition: background-color 0.12s ease, border-color 0.12s ease,
+                color 0.12s ease;
+}
+
+.btn:focus-visible {
+    box-shadow: 0 0 0 3px rgba(110, 139, 44, 0.25);
+}
+
+.btn-sm {
+    font-size: 0.795rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 7px;
+}
+
+/* Primary action: Add Product, Create Order, Record Packaging, Save ... */
+.btn-guava,
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--guavoco-white);
+}
+
+.btn-guava:hover,
+.btn-guava:focus,
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--guavoco-white);
+}
+
+.btn-guava:disabled,
+.btn-guava.disabled {
+    background-color: var(--guavoco-sage);
+    border-color: var(--guavoco-sage);
+    color: var(--guavoco-white);
+    opacity: 0.7;
+}
+
+/* Outlined secondary action */
+.btn-outline-guava {
+    background-color: transparent;
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-outline-guava:hover,
+.btn-outline-guava:focus {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--guavoco-white);
+}
+
+/* Quiet action - soft sage fill */
+.btn-outline-secondary,
+.btn-secondary {
+    background-color: var(--sage-light);
+    border-color: #DBE1D5;
+    color: var(--primary);
+}
+
+.btn-outline-secondary:hover,
+.btn-outline-secondary:focus,
+.btn-secondary:hover,
+.btn-secondary:focus {
+    background-color: #DCE3D4;
+    border-color: #CBD4C2;
+    color: var(--primary-hover);
+}
+
+/* Tertiary / cancel */
+.btn-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.btn-link:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+/* Destructive actions keep a restrained red - never Guavoco green. */
+.btn-danger,
+.btn-outline-danger {
+    background-color: transparent;
+    border-color: #C2705C;
+    color: #A8412C;
+}
+
+.btn-danger:hover,
+.btn-outline-danger:hover {
+    background-color: #A8412C;
+    border-color: #A8412C;
+    color: var(--guavoco-white);
+}
+
+/* ==========================================================================
+   9. Forms, search and filters
+   ========================================================================== */
+
+.form-label {
+    color: var(--label-color);
+    font-size: 0.815rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.form-control,
+.form-select {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--input-border);
+    color: var(--text-primary);
+    border-radius: 9px;
+    padding: 0.45rem 0.7rem;
+    font-size: 0.875rem;
+}
+
+.form-control::placeholder {
+    color: var(--text-muted);
+}
+
+/* Green focus ring instead of Bootstrap's bright blue. */
+.form-control:focus,
+.form-select:focus {
+    background-color: var(--bg-surface);
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(110, 139, 44, 0.12);
+    color: var(--text-primary);
+}
+
+.form-check-input:checked {
+    background-color: var(--primary);
+    border-color: var(--primary);
+}
+
+.form-check-input:focus {
+    border-color: var(--secondary);
+    box-shadow: 0 0 0 3px rgba(110, 139, 44, 0.12);
+}
+
+.form-check-label {
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.form-text {
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+/* The filter toolbar above tables. */
+.filter-bar {
+    background-color: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    padding: 0.9rem 1.1rem;
+    margin-bottom: 1.15rem;
+}
+
+.filter-bar .form-label {
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+}
+
+/* ==========================================================================
+   10. Alerts
+   ========================================================================== */
+
+.alert {
+    border-radius: 10px;
+    border-width: 1px;
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+}
+
+.alert-success {
+    background-color: #E8F0DF;
+    border-color: #D5E3C6;
+    color: #3F5A1A;
+}
+
+.alert-info {
+    background-color: #EEF1EA;
+    border-color: #DDE3D6;
+    color: #46513F;
+}
+
+.alert-warning {
+    background-color: #FAF0D7;
+    border-color: #F0E2BE;
+    color: #8A6414;
+}
+
+.alert-danger {
+    background-color: #FBE5E0;
+    border-color: #F3D2CA;
+    color: #A8412C;
+}
+
+.alert-secondary {
+    background-color: var(--sage-light);
+    border-color: #DBE1D5;
+    color: #55604C;
+}
+
+/* ==========================================================================
+   11. Empty states
+   ========================================================================== */
+
+.empty-state {
+    text-align: center;
+    padding: 2.75rem 1.25rem;
+    color: var(--text-secondary);
+}
+
+.empty-state .empty-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    background-color: var(--sage-light);
+    color: var(--secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state .empty-icon .gv-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.empty-state .empty-title {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--heading-section);
+    margin-bottom: 0.25rem;
+}
+
+.empty-state .empty-text {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    max-width: 30rem;
+    margin: 0 auto 0.9rem;
+}
+
+/* ==========================================================================
+   12. Lists, pagination, modals, misc
+   ========================================================================== */
+
+.list-group-item {
+    background-color: transparent;
+    border-color: var(--table-row-border);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+
+.page-link {
+    color: var(--primary);
+    border-color: var(--card-border);
+    border-radius: 7px;
+    margin: 0 2px;
+    font-size: 0.83rem;
+}
+
+.page-link:hover {
+    background-color: var(--sage-light);
+    border-color: var(--card-border);
+    color: var(--primary-hover);
+}
+
+.page-item.active .page-link {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--guavoco-white);
+}
+
+.page-item.disabled .page-link {
+    color: var(--text-muted);
+    background-color: transparent;
+    border-color: var(--card-border);
+}
+
+.modal-content {
+    border: 1px solid var(--card-border);
+    border-radius: var(--card-radius);
+}
+
+.modal-header,
+.modal-footer {
+    border-color: var(--table-row-border);
+}
+
+.breadcrumb {
+    font-size: 0.82rem;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: var(--text-muted);
+}
+
+hr {
+    border-color: var(--table-row-border);
+    opacity: 1;
+}
+
+/* A thin guava coral rule, used sparingly as a decorative separator. */
+.accent-rule {
+    height: 3px;
+    width: 44px;
+    border-radius: 999px;
+    background-color: var(--accent);
+    border: 0;
+    opacity: 1;
+}
+
+.gv-icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+    stroke-width: 1.7;
+}
+
+/* ==========================================================================
+   13. Login page
+   ========================================================================== */
+
+.login-page {
+    min-height: 100vh;
+    background-color: var(--bg-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+}
+
+.login-shell {
+    width: 100%;
+    max-width: 920px;
+    background-color: var(--bg-surface);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    box-shadow: 0 12px 36px rgba(38, 49, 31, 0.09);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+/* Left panel: deep green with a soft botanical texture. */
+.login-brand {
+    position: relative;
+    background-color: var(--primary);
+    color: var(--guavoco-white);
+    padding: 2.75rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.login-brand .login-leaves {
+    position: absolute;
+    inset: 0;
+    opacity: 0.16;
+    pointer-events: none;
+}
+
+.login-brand-content {
+    position: relative;
+}
+
+.login-brand h1 {
+    color: var(--guavoco-white);
+    font-size: 2.15rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+}
+
+.login-brand .login-tagline {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.92rem;
+    margin-bottom: 1.5rem;
+}
+
+.login-brand .login-points {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.84rem;
+}
+
+.login-brand .login-points li {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.3rem 0;
+}
+
+.login-brand .login-points .gv-icon {
+    color: var(--guavoco-sage);
+    width: 16px;
+    height: 16px;
+}
+
+.login-form-panel {
+    padding: 2.75rem 2.25rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.login-form-panel h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.demo-accounts {
+    background-color: var(--bg-main);
+    border: 1px solid var(--cream-dark);
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    font-size: 0.79rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 767.98px) {
+    .login-shell {
+        grid-template-columns: 1fr;
+        max-width: 440px;
+    }
+
+    .login-brand {
+        padding: 1.75rem;
+    }
+
+    .login-brand h1 {
+        font-size: 1.7rem;
+    }
+
+    .login-brand .login-points {
+        display: none;
+    }
+
+    .login-form-panel {
+        padding: 1.75rem;
+    }
+}
+
+/* ==========================================================================
+   14. Responsive
+   ========================================================================== */
+
+@media (max-width: 1199.98px) {
+    .main-content {
+        padding: 1.25rem 1.5rem 2.5rem;
+    }
+
+    .topbar {
+        padding: 0.85rem 1.5rem;
+    }
+}
+
+/* Below the Bootstrap md breakpoint the sidebar sits at the top of the page
+   and its menu collapses behind the toggle. */
+@media (max-width: 767.98px) {
+    .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar .brand {
+        min-height: auto;
+    }
+
+    .sidebar-toggle {
+        display: inline-flex;
+    }
+
+    .sidebar-menu {
+        overflow-y: visible;
+        max-height: none;
+    }
+
+    .app-shell {
+        margin-left: 0;
+    }
+
+    .topbar {
+        position: static;
+        padding: 0.85rem 1rem;
+    }
+
+    .main-content {
+        padding: 1rem;
+    }
+
+    .topbar .page-title {
+        font-size: 1.05rem;
+    }
+}
+
+/* Bootstrap's collapse hides the sidebar body on small screens; on desktop it
+   must stay a flex column so the menu scrolls and the account block stays put. */
+@media (min-width: 768px) {
+    .sidebar-body {
+        display: flex !important;
+    }
+}
+
+@media print {
+    .sidebar,
+    .topbar-actions,
+    .filter-bar {
+        display: none !important;
+    }
+
+    .app-shell {
+        margin-left: 0;
+    }
+
+    body {
+        background-color: var(--guavoco-white);
+    }
+}

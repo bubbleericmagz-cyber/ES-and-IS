@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <dl class="row small">
+            <dt class="col-sm-3">Distribution</dt>
+            <dd class="col-sm-9">{{ shipment.distribution_number }}</dd>
+            <dt class="col-sm-3">Order</dt>
+            <dd class="col-sm-9">{{ shipment.order.order_number }}</dd>
+            <dt class="col-sm-3">Customer</dt>
+            <dd class="col-sm-9">{{ shipment.order.customer.business_name }}</dd>
+            <dt class="col-sm-3">Units shipped</dt>
+            <dd class="col-sm-9">{{ shipment.quantity_distributed }}</dd>
+        </dl>
+        <hr>
+        <p class="text-muted small">
+            Confirming this delivery sets both the shipment and the order to
+            <strong>Delivered</strong>.
+        </p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_fields.html" %}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-guava">Confirm Delivery</button>
+                <a href="{% url 'distribution_detail' shipment.pk %}" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

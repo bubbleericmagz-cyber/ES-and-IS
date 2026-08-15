@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    <a href="{% url 'report_index' %}" class="btn btn-link">All reports</a>
+{% endblock %}
+
+{% block content %}
+
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-6">
+        <label class="form-label small mb-1">Batch number</label>
+        <input type="text" name="batch_number" value="{{ batch_number }}"
+               class="form-control" list="batch-options" placeholder="GVC-BATCH-0001" required>
+        <datalist id="batch-options">
+            {% for number in all_batches %}
+                <option value="{{ number }}"></option>
+            {% endfor %}
+        </datalist>
+    </div>
+    <div class="col-md-3">
+        <button type="submit" class="btn btn-guava">Trace Batch</button>
+    </div>
+</form>
+
+{% if not_found %}
+    <div class="alert alert-warning">
+        No batch was found with the number "{{ batch_number }}". Check the number and try again.
+    </div>
+{% endif %}
+
+{% if batch %}
+    <div class="row g-3 mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="section-label">
+                        Step 1 &mdash; Production
+                    </div>
+                    <dl class="row mb-0 small">
+                        <dt class="col-5">Batch Number</dt>
+                        <dd class="col-7"><code>{{ batch.batch_number }}</code></dd>
+                        <dt class="col-5">Product</dt><dd class="col-7">{{ batch.product.name }}</dd>
+                        <dt class="col-5">Production Date</dt><dd class="col-7">{{ batch.production_date }}</dd>
+                        <dt class="col-5">Expiration Date</dt>
+                        <dd class="col-7">
+                            {{ batch.expiration_date }}
+                            {% include "components/status_badge.html" with status=batch.expiry_state %}
+                        </dd>
+                        <dt class="col-5">Quantity Produced</dt><dd class="col-7">{{ batch.quantity_produced }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            {% include "components/stat_card.html" with label="Packaged" value=batch.quantity_packaged icon="i-box" tone="secondary" small=True %}
+        </div>
+        <div class="col-md-2">
+            {% include "components/stat_card.html" with label="Damaged" value=batch.quantity_damaged icon="i-alert" tone="guava" small=True %}
+        </div>
+        <div class="col-md-2">
+            {% include "components/stat_card.html" with label="Still In Inventory" value=remaining_inventory icon="i-inventory" tone="primary" small=True %}
+        </div>
+    </div>
+
+    <div class="section-label">Step 2 &mdash; Packaging</div>
+    <div class="table-scroll mb-4">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Packaging ID</th><th>Date</th>
+                    <th class="text-end">Received</th><th class="text-end">Packaged</th>
+                    <th class="text-end">Damaged</th><th class="text-end">Efficiency</th><th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in packaging_records %}
+                    <tr>
+                        <td>{{ record.packaging_id }}</td>
+                        <td>{{ record.packaging_date }}</td>
+                        <td class="text-end">{{ record.quantity_received }}</td>
+                        <td class="text-end">{{ record.quantity_packaged }}</td>
+                        <td class="text-end">{{ record.damaged_quantity }}</td>
+                        <td class="text-end">{{ record.efficiency }}%</td>
+                        <td>{% include "components/status_badge.html" with status=record.status %}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7" class="text-muted small">This batch has not been packaged yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="section-label">
+        Step 3 &mdash; Where This Batch Went ({{ shipped_total }} units shipped)
+    </div>
+    <div class="table-scroll mb-3">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>Distribution</th><th>Order</th><th>Customer</th>
+                    <th>Customer Type</th><th class="text-end">Units From This Batch</th>
+                    <th>Date</th><th>Delivery Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'distribution_detail' item.distribution.pk %}">
+                                {{ item.distribution.distribution_number }}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="{% url 'order_detail' item.distribution.order.pk %}">
+                                {{ item.distribution.order.order_number }}
+                            </a>
+                        </td>
+                        <td>{{ item.distribution.order.customer.business_name }}</td>
+                        <td>{{ item.distribution.order.customer.customer_type }}</td>
+                        <td class="text-end">{{ item.quantity }}</td>
+                        <td>{{ item.distribution.distribution_date }}</td>
+                        <td>
+                            {% include "components/status_badge.html" with status=item.distribution.delivery_status %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-muted small">
+                            No units from this batch have been shipped yet.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if customers %}
+        <p class="small">
+            <strong>Customers who received products from {{ batch.batch_number }}:</strong>
+            {{ customers|join:", " }}
+        </p>
+    {% endif %}
+{% endif %}
+{% endblock %}

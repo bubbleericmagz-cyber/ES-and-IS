@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row g-3">
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold">Packaging Report</h6>
+                <p class="small text-muted">
+                    Date, batch, quantity received, quantity packaged and damaged quantity,
+                    with the packaging efficiency for each record.
+                </p>
+                <a href="{% url 'packaging_report' %}" class="btn btn-sm btn-guava">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold">Inventory Report</h6>
+                <p class="small text-muted">
+                    Product, batch, available stock, expiration date and inventory status.
+                </p>
+                <a href="{% url 'inventory_report' %}" class="btn btn-sm btn-guava">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold">Orders Report</h6>
+                <p class="small text-muted">
+                    Order number, customer, date, quantity, total amount and status.
+                </p>
+                <a href="{% url 'orders_report' %}" class="btn btn-sm btn-guava">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold">Distribution Report</h6>
+                <p class="small text-muted">
+                    Distribution number, order, customer, quantity, date and delivery status.
+                </p>
+                <a href="{% url 'distribution_report' %}" class="btn btn-sm btn-guava">Open</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-xl-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h6 class="fw-semibold">Batch Traceability</h6>
+                <p class="small text-muted">
+                    Enter a batch number to see everything about it, from production
+                    all the way to the customers who received it.
+                </p>
+                <a href="{% url 'batch_traceability' %}" class="btn btn-sm btn-guava">Open</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<p class="text-muted small mt-4">
+    Every report can be filtered by date range, product and status, and exported to CSV.
+</p>
+{% endblock %}

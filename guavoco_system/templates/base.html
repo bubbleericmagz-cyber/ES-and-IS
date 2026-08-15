@@ -1,0 +1,262 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title|default:"Guavoco" }} | Guavoco System</title>
+    {# Bootstrap first, then the Guavoco theme so it overrides the defaults. #}
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/guavoco-theme.css' %}">
+</head>
+<body>
+
+{% include "components/icons.html" %}
+
+<nav class="sidebar">
+    {# ---- Branding ---- #}
+    <div class="brand">
+        <div>
+            <div class="brand-name">Guavoco</div>
+            <small class="brand-subtitle">Packaging &amp; Distribution System</small>
+        </div>
+        {# Shown on small screens only, to open and close the menu. #}
+        <button class="sidebar-toggle" type="button" data-bs-toggle="collapse"
+                data-bs-target="#sidebarBody" aria-controls="sidebarBody"
+                aria-expanded="false" aria-label="Toggle menu">
+            <svg class="gv-icon"><use href="#i-menu"></use></svg>
+        </button>
+    </div>
+
+    <div class="collapse sidebar-body" id="sidebarBody">
+        <ul class="nav flex-column sidebar-menu">
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}"
+                   href="{% url 'dashboard' %}">
+                    <svg class="gv-icon"><use href="#i-grid"></use></svg> Dashboard
+                </a>
+            </li>
+
+            <li class="nav-section">Production</li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'product' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'product_list' %}">
+                    <svg class="gv-icon"><use href="#i-package"></use></svg> Products
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'batch' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'batch_list' %}">
+                    <svg class="gv-icon"><use href="#i-layers"></use></svg> Production Batches
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'packaging' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'packaging_list' %}">
+                    <svg class="gv-icon"><use href="#i-box"></use></svg> Packaging
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'material' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'material_list' %}">
+                    <svg class="gv-icon"><use href="#i-archive"></use></svg> Packaging Materials
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'inventory' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'inventory_list' %}">
+                    <svg class="gv-icon"><use href="#i-inventory"></use></svg> Inventory
+                </a>
+            </li>
+
+            <li class="nav-section">Sales &amp; Delivery</li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'customer' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'customer_list' %}">
+                    <svg class="gv-icon"><use href="#i-users"></use></svg> Customers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'order' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'order_list' %}">
+                    <svg class="gv-icon"><use href="#i-orders"></use></svg> Orders
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'distribut' in request.resolver_match.url_name or 'delivery' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'distribution_list' %}">
+                    <svg class="gv-icon"><use href="#i-truck"></use></svg> Distribution
+                </a>
+            </li>
+
+            <li class="nav-section">Records</li>
+            <li class="nav-item">
+                <a class="nav-link {% if 'report' in request.resolver_match.url_name or 'traceability' in request.resolver_match.url_name %}active{% endif %}"
+                   href="{% url 'report_index' %}">
+                    <svg class="gv-icon"><use href="#i-report"></use></svg> Reports
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'activity_log' %}active{% endif %}"
+                   href="{% url 'activity_log' %}">
+                    <svg class="gv-icon"><use href="#i-activity"></use></svg> Activity Log
+                </a>
+            </li>
+            {% if is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}"
+                       href="{% url 'user_list' %}">
+                        <svg class="gv-icon"><use href="#i-shield"></use></svg> Users
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+
+        {# Pinned to the bottom of the sidebar, so Logout is always reachable. #}
+        <div class="sidebar-footer">
+            <div class="px-2">
+                <div class="account-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="account-role">{{ user_role }}</div>
+            </div>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button type="submit" class="nav-link">
+                    <svg class="gv-icon"><use href="#i-logout"></use></svg> Logout
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="app-shell">
+
+    {# ---- Top navigation bar ---- #}
+    <header class="topbar">
+        <div class="topbar-titles">
+            <h1 class="page-title">{% block heading %}{{ page_title }}{% endblock %}</h1>
+            {% block subtitle %}
+                {% if page_subtitle %}<p class="page-subtitle">{{ page_subtitle }}</p>{% endif %}
+            {% endblock %}
+        </div>
+
+        <div class="topbar-actions">
+            {% block header_actions %}{% endblock %}
+
+            <span class="topbar-divider"></span>
+
+            {# Notifications: low stock and stock expiring within 30 days. #}
+            <div class="dropdown">
+                <a class="topbar-bell" href="#" role="button" data-bs-toggle="dropdown"
+                   aria-expanded="false" aria-label="Notifications">
+                    <svg class="gv-icon"><use href="#i-bell"></use></svg>
+                    {% if alert_count %}<span class="bell-dot"></span>{% endif %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end p-0" style="width: 310px;">
+                    <li class="dropdown-header px-3 pt-3 pb-2">
+                        Attention needed{% if alert_count %} ({{ alert_count }}){% endif %}
+                    </li>
+                    {% for product in alert_low_products %}
+                        <li><a class="dropdown-item notification-item px-3 py-2"
+                               href="{% url 'inventory_list' %}">
+                            <span class="stat-icon icon-warning" style="width:30px;height:30px;">
+                                <svg class="gv-icon" style="width:15px;height:15px;">
+                                    <use href="#i-alert"></use></svg>
+                            </span>
+                            <span>
+                                <strong>{{ product.name }}</strong> is low on stock
+                                <span class="d-block text-muted small">
+                                    {{ product.current_stock }} units left
+                                </span>
+                            </span>
+                        </a></li>
+                    {% endfor %}
+                    {% for material in alert_low_materials %}
+                        <li><a class="dropdown-item notification-item px-3 py-2"
+                               href="{% url 'material_list' %}">
+                            <span class="stat-icon icon-warning" style="width:30px;height:30px;">
+                                <svg class="gv-icon" style="width:15px;height:15px;">
+                                    <use href="#i-archive"></use></svg>
+                            </span>
+                            <span>
+                                <strong>{{ material.name }}</strong> needs reordering
+                                <span class="d-block text-muted small">
+                                    {{ material.quantity_available }} {{ material.unit }} left
+                                </span>
+                            </span>
+                        </a></li>
+                    {% endfor %}
+                    {% for row in alert_expiring %}
+                        <li><a class="dropdown-item notification-item px-3 py-2"
+                               href="{% url 'inventory_list' %}">
+                            <span class="stat-icon icon-guava" style="width:30px;height:30px;">
+                                <svg class="gv-icon" style="width:15px;height:15px;">
+                                    <use href="#i-clock"></use></svg>
+                            </span>
+                            <span>
+                                <strong>{{ row.batch.batch_number }}</strong> {{ row.expiry_state|lower }}
+                                <span class="d-block text-muted small">
+                                    {{ row.quantity_available }} units &middot; {{ row.expiration_date }}
+                                </span>
+                            </span>
+                        </a></li>
+                    {% endfor %}
+                    {% if not alert_count %}
+                        <li><span class="dropdown-item-text px-3 py-3 text-muted small">
+                            Nothing needs attention right now.
+                        </span></li>
+                    {% endif %}
+                </ul>
+            </div>
+
+            {# Profile menu #}
+            <div class="dropdown">
+                <a class="user-chip" href="#" role="button" data-bs-toggle="dropdown"
+                   aria-expanded="false">
+                    <span class="user-avatar">
+                        {{ user.get_full_name|default:user.username|slice:":1"|upper }}
+                    </span>
+                    <span>
+                        <span class="user-name d-block">
+                            {{ user.get_full_name|default:user.username }}
+                        </span>
+                        <span class="user-role d-block">{{ user_role }}</span>
+                    </span>
+                    <svg class="gv-icon" style="width:14px;height:14px;">
+                        <use href="#i-chevron-down"></use></svg>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li class="dropdown-header">Signed in as {{ user.username }}</li>
+                    {% if is_admin %}
+                        <li><a class="dropdown-item" href="{% url 'user_list' %}">Manage users</a></li>
+                    {% endif %}
+                    <li><a class="dropdown-item" href="{% url 'activity_log' %}">Activity log</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="post" action="{% url 'logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">Logout</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<script src="{% static 'vendor/bootstrap.bundle.min.js' %}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

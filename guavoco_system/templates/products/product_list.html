@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load guavoco_extras %}
+
+{% block header_actions %}
+    {% if is_admin %}
+        <a href="{% url 'product_create' %}" class="btn btn-guava">Add Product</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<form method="get" class="filter-bar row g-2 align-items-end">
+    <div class="col-md-5">
+        <label class="form-label small mb-1">Search by name or SKU</label>
+        <input type="text" name="q" value="{{ search }}" class="form-control"
+               placeholder="Guavoco, GVC-TP-001 ...">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label small mb-1">Status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            <option value="active" {% if status == 'active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status == 'inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+    </div>
+    <div class="col-md-4">
+        <button type="submit" class="btn btn-outline-guava">Apply</button>
+        <a href="{% url 'product_list' %}" class="btn btn-link">Clear</a>
+    </div>
+</form>
+
+<div class="table-scroll">
+    <table class="table table-hover align-middle">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Size</th>
+                <th class="text-end">Price</th>
+                <th class="text-end">Current Stock</th>
+                <th class="text-end">Reorder Level</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>
+                        <a href="{% url 'product_detail' product.pk %}">{{ product.name }}</a>
+                    </td>
+                    <td><code>{{ product.sku }}</code></td>
+                    <td>{{ product.size }}</td>
+                    <td class="text-end">PHP {{ product.selling_price|floatformat:2 }}</td>
+                    <td class="text-end">{{ product.current_stock }}</td>
+                    <td class="text-end">{{ product.reorder_level }}</td>
+                    <td>
+                        {% include "components/status_badge.html" with status=product.status_label %}
+                    </td>
+                    <td class="text-end">
+                        {% if is_admin %}
+                            <a href="{% url 'product_update' product.pk %}"
+                               class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <a href="{% url 'product_toggle' product.pk %}"
+                               class="btn btn-sm btn-outline-secondary">
+                                {% if product.is_active %}Deactivate{% else %}Activate{% endif %}
+                            </a>
+                        {% else %}
+                            <span class="text-muted small">View only</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        No products found. {% if is_admin %}Add one to get started.{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

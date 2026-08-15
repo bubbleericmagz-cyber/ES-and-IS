@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <p class="text-muted small">
+            Move <strong>{{ shipment.distribution_number }}</strong> along its delivery stages:
+            Preparing &rarr; For Delivery &rarr; In Transit. Use
+            <em>Confirm Delivery</em> to record who received it.
+        </p>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_fields.html" %}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-guava">Save Changes</button>
+                <a href="{% url 'distribution_detail' shipment.pk %}" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

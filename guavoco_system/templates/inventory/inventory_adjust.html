@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <dl class="row small">
+            <dt class="col-sm-3">Product</dt><dd class="col-sm-9">{{ row.product.name }}</dd>
+            <dt class="col-sm-3">Batch</dt><dd class="col-sm-9">{{ row.batch.batch_number }}</dd>
+            <dt class="col-sm-3">Current quantity</dt>
+            <dd class="col-sm-9"><strong>{{ row.quantity_available }}</strong> units</dd>
+        </dl>
+        <hr>
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "partials/form_fields.html" %}
+            <div class="mt-4">
+                <button type="submit" class="btn btn-guava">Save Adjustment</button>
+                <a href="{% url 'inventory_list' %}" class="btn btn-link">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
